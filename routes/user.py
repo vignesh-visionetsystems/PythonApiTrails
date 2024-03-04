@@ -9,7 +9,9 @@ user = APIRouter()
 
 userCollection = db_instance.user
 
-
+@user.get("/")
+async def root():
+    return {"message":"Api is working..."}
 
 @user.get("/get_all_users")
 async def getAllUsers():
