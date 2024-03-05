@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from config.db import db_instance
 from models.roles import Roles
-from scheme.role import RoleEntity,RolesEntity
 from bson import ObjectId
 
 roles = APIRouter()
@@ -11,7 +10,7 @@ rolesCollection = db_instance.roles
 
 @roles.get("/roles")
 async def getRoles():
-    return RolesEntity(rolesCollection.find())
+    return Roles.toList(rolesCollection.find())
 
 
 @roles.post("/create_role")
@@ -22,5 +21,5 @@ async def createUser(role:Roles):
     else:
         inserRecord =rolesCollection.insert_one(dict(role))
         inserted_id = inserRecord.inserted_id
-        return RoleEntity(rolesCollection.find_one({"_id":ObjectId(inserted_id)}))
+        return Roles.to_dict(rolesCollection.find_one({"_id":ObjectId(inserted_id)}))
     
