@@ -4,6 +4,8 @@ from models.auth.user import UserEntity
 # from scheme.user import UsersEntity
 from bson import ObjectId
 from models.auth.login import Login
+from models.auth.login_response import LoginResponse
+from routes.jwt_token import get_token
 
 user = APIRouter()
 
@@ -43,12 +45,14 @@ async def login(user:Login):
     userStatus = userCollection.find_one({"email":user.email})
     print("userStatus",userStatus)
     if userStatus != None:
-        currentUser =  UserEntity.from_dict(userStatus)
-        print("currentUser",currentUser)
-        if(user.password != currentUser.password):
+        loginResponse =  LoginResponse.from_dict(userStatus)
+        print("currentUser",loginResponse)
+        if(user.password != loginResponse.password):
             return getErrorMesssage("Password Incorrect")
         else:
-            return currentUser
+            token = await get_token()
+            loginResponse.accessToken = token["token"]
+            return loginResponse
     else:
      return getErrorMesssage("User doesn't exists")
 
