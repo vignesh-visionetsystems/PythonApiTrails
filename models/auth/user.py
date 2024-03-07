@@ -1,4 +1,5 @@
 from  pydantic import BaseModel
+from typing import List,Optional
 
 
 class UserEntity(BaseModel):
@@ -7,7 +8,7 @@ class UserEntity(BaseModel):
     email:str
     password:str
     phoneNumber:str
-    roleId:str
+    roleId:List[str]
 
     def to_dict(item) -> dict:
         return {
@@ -23,7 +24,7 @@ class UserEntity(BaseModel):
     @classmethod
     def from_dict(cls, data):
             return cls(
-                id=data.get("_id_"),
+                id=data.get("_id"),
                 firstName=data.get("firstName"),
                 lastName=data.get("lastName"),
                 email=data.get("email"),
@@ -32,7 +33,7 @@ class UserEntity(BaseModel):
                 roleId=data.get("roleId")
             )
     
-    def toList(entity) -> list:
+    def UsersEntity(entity) -> list:
         return [UserEntity.to_dict(item) for item in entity]
 
 

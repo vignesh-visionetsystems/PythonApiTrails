@@ -1,13 +1,15 @@
 from  pydantic import BaseModel
-from  typing import Optional
+from  typing import Optional,List
+
 
 class LoginResponse(BaseModel):
+    id:str
     firstName:str
     lastName:str
     email:str
     password:str
     phoneNumber:str
-    roleId:str
+    roleId:List[str]
     accessToken:Optional[str]
 
     def to_dict(item) -> dict:
@@ -25,7 +27,7 @@ class LoginResponse(BaseModel):
     @classmethod
     def from_dict(cls, data):
             return cls(
-                id=data.get("_id_"),
+                id= str(data.get("_id")),
                 firstName=data.get("firstName"),
                 lastName=data.get("lastName"),
                 email=data.get("email"),

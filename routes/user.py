@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from config.db import db_instance
 from models.auth.user import UserEntity
-# from scheme.user import UsersEntity
 from bson import ObjectId
 from models.auth.login import Login
 from models.auth.login_response import LoginResponse
@@ -36,7 +35,10 @@ async def createUser(user:UserEntity):
     else:
         insertUser =userCollection.insert_one(dict(user))
         inserted_id = insertUser.inserted_id
-        return UserEntity(userCollection.find_one({"_id":ObjectId(inserted_id)}))
+        print("inserted_id : {}".format(inserted_id))
+        createdUser = userCollection.find_one({"_id":ObjectId(inserted_id)})
+        print("createdUser : {}".format(createdUser))
+        return UserEntity.to_dict(createdUser)
     
 
 
@@ -50,9 +52,10 @@ async def login(user:Login):
         if(user.password != loginResponse.password):
             return getErrorPayload("Password Incorrect")
         else:
-            token = await get_token()
+            token = get_token(loginResponse.id)
             loginResponse.accessToken = token["token"]
-            return loginResponse
+            print("currentUserWithAccessToken",loginResponse)
+            return dict(loginResponse)
     else:
      return getErrorPayload("User doesn't exists")
 
