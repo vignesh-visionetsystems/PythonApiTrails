@@ -48,14 +48,14 @@ async def login(user:Login):
         loginResponse =  LoginResponse.from_dict(userStatus)
         print("currentUser",loginResponse)
         if(user.password != loginResponse.password):
-            return getErrorMesssage("Password Incorrect")
+            return getErrorPayload("Password Incorrect")
         else:
             token = await get_token()
             loginResponse.accessToken = token["token"]
             return loginResponse
     else:
-     return getErrorMesssage("User doesn't exists")
+     return getErrorPayload("User doesn't exists")
 
     
-def getErrorMesssage(message:str):
+def getErrorPayload(message:str):
          return {"message":message}

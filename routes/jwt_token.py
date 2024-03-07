@@ -28,14 +28,13 @@ def create_access_token(data: dict):
     # return the generated token
     return encoded_jwt
  
-# the endpoint to get the token
-@jwtRoute.get("/get_token")
-async def get_token():
-   
+
+def get_token(userId:str):
     # data to be signed using token
     data = {
         'info': 'secret information',
-        'from': 'GFG'
+        'from': 'GFG',
+        'userId':userId
     }
     token = create_access_token(data=data)
     return {'token': token}
@@ -49,7 +48,7 @@ async def verify_token(token: str):
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except JWTError:
-        raise HTTPException(
+        raise HTTPException( 
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         )
