@@ -16,6 +16,6 @@ class Roles(BaseModel):
     @classmethod
     def from_dict(cls, data):
         return cls(
-            roleId=data.get("_id_"),
+            roleId=data.get("_id"),
             roleName=data.get("roleName")
             )

@@ -52,3 +52,14 @@ async def verify_token(token: str):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
         )
+    
+
+
+def getUserIdFromToken(token:str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload["userId"]
+    except JWTError as e:
+        print("Error decoding JWT token: ",e)
+        raise
+ 

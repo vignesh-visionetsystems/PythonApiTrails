@@ -4,7 +4,7 @@ from models.auth.user import UserEntity
 from bson import ObjectId
 from models.auth.login import Login
 from models.auth.login_response import LoginResponse
-from routes.jwt_token import get_token
+from routes.autentication_token import get_token
 
 user = APIRouter()
 

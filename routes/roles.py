@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from config.db import db_instance
-from models.roles import Roles
+from models.roles.roles import Roles
 from bson import ObjectId
 
 roles = APIRouter()
@@ -14,7 +14,7 @@ async def getRoles():
 
 
 @roles.post("/create_role")
-async def createUser(role:Roles):
+async def createNewRole(role:Roles):
     queryStatus = rolesCollection.find_one({"roleName":role.roleName})
     if queryStatus:
         return {"message":"Role is already exists"}
