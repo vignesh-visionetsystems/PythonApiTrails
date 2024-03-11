@@ -22,7 +22,7 @@ def create_access_token(data: dict):
      
     # expire time of the token
     expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
+    # to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
      
     # return the generated token
@@ -59,7 +59,7 @@ def getUserIdFromToken(token:str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload["userId"]
-    except JWTError as e:
-        print("Error decoding JWT token: ",e)
-        raise
+    except Exception as e:
+        # print("Error decoding JWT token: ",e)
+        raise e
  

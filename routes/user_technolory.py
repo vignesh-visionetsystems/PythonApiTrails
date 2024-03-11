@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,HTTPException
 from config.db import db_instance
 from models.roles.roles import Roles
 from models.technology.technology import Technolgoy
@@ -26,7 +26,7 @@ async def getUserRoleDetails(accessToken:str= Header()):
             pipeline = [
                 {
                     '$match': {
-                        '_id': ObjectId('65e964184af6c9c48a81696c')
+                        '_id': ObjectId(userId)
                     }
                 }, {
                     '$unwind': {
@@ -91,8 +91,29 @@ async def getUserRoleDetails(accessToken:str= Header()):
                 }, {
                     '$lookup': {
                         'from': 'userTechnology', 
-                        'localField': 'technologies._id', 
-                        'foreignField': 'techId', 
+                        'let': {
+                            'userId': '$userId', 
+                            'techId': '$technologies._id'
+                        }, 
+                        'pipeline': [
+                            {
+                                '$match': {
+                                    '$expr': {
+                                        '$and': [
+                                            {
+                                                '$eq': [
+                                                    '$userId', '$$userId'
+                                                ]
+                                            }, {
+                                                '$eq': [
+                                                    '$techId', '$$techId'
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        ], 
                         'as': 'userStatus'
                     }
                 }, {
@@ -101,27 +122,8 @@ async def getUserRoleDetails(accessToken:str= Header()):
                         'preserveNullAndEmptyArrays': True
                     }
                 }, {
-                    '$project': {
-                        'userId': 1, 
-                        'roleId': 1, 
-                        'roleName': 1, 
-                        'technologies': {
-                            '$mergeObjects': [
-                                '$technologies', {
-                                    'isCompleted': {
-                                        '$cond': {
-                                            'if': {
-                                                '$eq': [
-                                                    '$userStatus.isCompleted', True
-                                                ]
-                                            }, 
-                                            'then': True, 
-                                            'else': False
-                                        }
-                                    }
-                                }
-                            ]
-                        }
+                    '$addFields': {
+                        'technologies.isCompleted': '$userStatus.isCompleted'
                     }
                 }, {
                     '$group': {
@@ -158,7 +160,17 @@ async def getUserRoleDetails(accessToken:str= Header()):
                                     'techId': {
                                         '$toString': '$$item._id'
                                     }, 
-                                    'isCompleted': '$$item.isCompleted'
+                                    'isCompleted': {
+                                        '$cond': {
+                                            'if': {
+                                                '$eq': [
+                                                    '$$item.isCompleted', True
+                                                ]
+                                            }, 
+                                            'then': True, 
+                                            'else': False
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -170,8 +182,11 @@ async def getUserRoleDetails(accessToken:str= Header()):
             return result
         else:
             return {"message":"User not exists"}
-    except JWTError:
-        raise
+    except JWTError as e:
+        print("Error decoding JWT token: ",e)
+        raise HTTPException(status_code=401, detail=str(e))
+    except Exception as e:
+         raise HTTPException(status_code=400, detail=str(e))
 
 
 
