@@ -1,7 +1,5 @@
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter,HTTPException,Depends
 from config.db import db_instance
-from models.roles.roles import Roles
-from models.technology.technology import Technolgoy
 from bson import ObjectId
 from fastapi import Header
 from routes.autentication_token import getUserIdFromToken
@@ -15,9 +13,8 @@ userCollection = db_instance.user
 
 
 @userTechnologiesRouter.get("/user_roles_details")
-async def getUserRoleDetails(accessToken:str= Header()):
+async def getUserRoleDetails(userId:str= Depends(getUserIdFromToken)):
     try:
-        userId = getUserIdFromToken(token=accessToken)
         userResult = userCollection.find_one({"_id":ObjectId(userId)})
         userResult["_id"] = str(userResult["_id"])
         print("UserId",userId)
@@ -182,11 +179,8 @@ async def getUserRoleDetails(accessToken:str= Header()):
             return result
         else:
             return {"message":"User not exists"}
-    except JWTError as e:
-        print("Error decoding JWT token: ",e)
-        raise HTTPException(status_code=401, detail=str(e))
     except Exception as e:
-         raise HTTPException(status_code=400, detail=str(e))
+         raise HTTPException(status_code=200, detail=str(e))
 
 
 

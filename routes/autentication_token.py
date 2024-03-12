@@ -1,4 +1,4 @@
-from fastapi import  status, HTTPException
+from fastapi import  status, HTTPException,Header
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi import APIRouter
@@ -55,11 +55,12 @@ async def verify_token(token: str):
     
 
 
-def getUserIdFromToken(token:str):
+def getUserIdFromToken(token:str= Header()):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload["userId"]
+    except JWTError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail=str(e))
     except Exception as e:
-        # print("Error decoding JWT token: ",e)
-        raise e
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail=str(e))
  

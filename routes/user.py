@@ -36,9 +36,7 @@ async def createUser(user:UserEntity):
         insertUser =userCollection.insert_one(dict(user))
         inserted_id = insertUser.inserted_id
         print("inserted_id : {}".format(inserted_id))
-        createdUser = userCollection.find_one({"_id":ObjectId(inserted_id)})
-        print("createdUser : {}".format(createdUser))
-        return UserEntity.to_dict(createdUser)
+        return {"message":"Created Successfully"}
     
 
 
