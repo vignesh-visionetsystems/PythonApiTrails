@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter,status,HTTPException
 from config.db import db_instance
 from models.auth.user import UserEntity
 from bson import ObjectId
@@ -40,7 +40,7 @@ async def createUser(user:UserEntity):
     
 
 
-@user.post("/login")
+@user.post("/login",status_code=status.HTTP_200_OK)
 async def login(user:Login):
     userStatus = userCollection.find_one({"email":user.email})
     print("userStatus",userStatus)
@@ -59,4 +59,4 @@ async def login(user:Login):
 
     
 def getErrorPayload(message:str):
-         return {"message":message}
+         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail=message)
